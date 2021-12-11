@@ -10,7 +10,7 @@ export const Lighting = (props) => {
   // Spotlight 1 --------------------
   // --------------------------------
 
-  const spotLight = new THREE.SpotLight(0xffffff, 5);åß
+  const spotLight = new THREE.SpotLight(0xffffff, 5);
   spotLight.distance = 100;
   spotLight.decay = 1.0;
 

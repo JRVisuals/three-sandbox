@@ -3,102 +3,84 @@ import * as THREE from 'three';
 import OrbitControls from 'threejs-orbit-controls';
 import { Lighting } from '../scene/Elements';
 
-
-import { 
-    createSimpleCube,
-    // createGround,
-    // createAllBars,
-    // createTargetCap,
+import {
+  createSimpleCube,
+  // createGround,
+  // createAllBars,
+  // createTargetCap,
 } from '../scene/Geometry';
 
 class Scene extends React.Component {
+  componentDidMount() {
+    this.initScene();
+  }
+  componentWillUnmount() {}
 
-    componentDidMount() {
-        this.initScene();
-    }
-    componentWillUnmount() {
-    }
+  initScene = () => {
+    const { height, width, showHelpers } = this.props;
 
-    initScene = () => {
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(50, 1, 1, 1000);
+    this.renderer = new THREE.WebGLRenderer();
+    //  this.renderer.shadowMapEnabled = true;
+    //  this.renderer.shadowMapSoft = true;
 
-        
+    const loader = new THREE.TextureLoader();
+    const bgTexture = loader.load('./img/hsb.png');
+    scene.background = bgTexture;
 
-        const {height, width, showHelpers} = this.props;
+    this.renderer.setSize(width, height);
 
-        var scene = new THREE.Scene();
-        var camera = new THREE.PerspectiveCamera( 50, 1, 1, 1000 );
-        this.renderer = new THREE.WebGLRenderer();
-      //  this.renderer.shadowMapEnabled = true;
-      //  this.renderer.shadowMapSoft = true;
+    this.mount.appendChild(this.renderer.domElement);
 
-      const loader = new THREE.TextureLoader();
-const bgTexture = loader.load('./img/hsb.png');
-scene.background = bgTexture;
+    camera.position.set(0, 0, 200);
+    camera.lookAt(scene.position);
 
-        this.renderer.setSize( width, height );
+    const controls = new OrbitControls(camera);
+    controls.enabled = true;
+    controls.maxDistance = 5000;
+    controls.minDistance = 0;
+    controls.update();
 
-        this.mount.appendChild( this.renderer.domElement );
-Í
-        camera.position.set( 0, 0, 200);
-        camera.lookAt(scene.position);
+    scene.add(new THREE.AmbientLight(0xaaaaaa)); // soft white light
 
-        const controls = new OrbitControls(camera);
-        controls.enabled = true;
-        controls.maxDistance = 5000;
-        controls.minDistance = 0;
-        controls.update();
+    scene.add(Lighting({ scene }).sceneLights);
 
-        
+    const simpleCube = createSimpleCube([2, -5, 0]);
+    scene.add(simpleCube);
 
-        scene.add( new THREE.AmbientLight( 0xaaaaaa ));// soft white light
+    const simpleCubeA = createSimpleCube([-100, 0, -100]);
+    scene.add(simpleCubeA);
 
-        scene.add ( Lighting ({scene}).sceneLights );
- 
-        const simpleCube = createSimpleCube([2,-5,0]);
-        scene.add( simpleCube );
+    const simpleCubeB = createSimpleCube([100, 0, -100]);
+    scene.add(simpleCubeB);
 
-        const simpleCubeA = createSimpleCube([-100,0,-100]);
-        scene.add( simpleCubeA );
+    const animate = () => {
+      requestAnimationFrame(animate);
 
-        const simpleCubeB = createSimpleCube([100,0,-100]);
-        scene.add( simpleCubeB );
+      //   simpleCube.rotation.z -= 0.005;
+      simpleCube.rotation.x -= 0.01;
+      //  simpleCube.rotation.y -= 0.001;
 
+      simpleCubeA.rotation.x += 0.005;
+      simpleCubeB.rotation.x += 0.005;
 
-        const animate = () =>{
-            requestAnimationFrame( animate );
+      this.renderer.render(scene, camera);
+    };
 
-           //   simpleCube.rotation.z -= 0.005;
-              simpleCube.rotation.x -= 0.01;
-            //  simpleCube.rotation.y -= 0.001;
+    animate();
+  };
 
-            simpleCubeA.rotation.x += 0.005;
-            simpleCubeB.rotation.x += 0.005;
+  resetScene = () => {
+    this.mount.removeChild(this.renderer.domElement);
+    this.initScene();
+  };
 
-            
-            this.renderer.render( scene, camera );
-        }
-       
+  render() {
+    const renderScene = <div ref={(ref) => (this.mount = ref)} />;
 
-        animate();
-
-    }
-
-    resetScene = () => {
-        this.mount.removeChild( this.renderer.domElement );
-        this.initScene();
-    }
-
-    render() {
-
-        const renderScene = <div ref={ref => (this.mount = ref)} /> 
-        
-        return (
-            <>
-                {renderScene}
-            </>
-        );
-    }
-
+    return <>{renderScene}</>;
+  }
 }
 
 export default Scene;
