@@ -19,7 +19,7 @@ const App = () => {
         }}
       >
         <br />
-        Heart Shaped Box
+        Multipass Selective Shader
       </div>
 
       <div className='Sandbox'>

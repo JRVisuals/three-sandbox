@@ -3,7 +3,7 @@ import * as THREE from 'three';
 // Geometry --------
 
 export const createSimpleCube = (offsets) => {
-  const texture = new THREE.TextureLoader().load('./img/hsb.png');
+  const texture = new THREE.TextureLoader().load('./img/multipass.jpg');
   //const material = new THREE.MeshBasicMaterial( {  map: texture } );
 
   const loader = new THREE.CubeTextureLoader();
@@ -27,6 +27,15 @@ export const createSimpleCube = (offsets) => {
   });
 
   const cubeGeo = new THREE.BoxGeometry(80, 80, 80);
+  const cube = new THREE.Mesh(cubeGeo, cubeMaterial);
+  cube.position.set(...offsets);
+  cube.rotation.z = (-45 * Math.PI) / 180;
+  cube.rotation.x = (-35 * Math.PI) / 180;
+  return cube;
+};
+
+export const createGlowCube = (offsets, cubeMaterial) => {
+  const cubeGeo = new THREE.BoxGeometry(10, 10, 10);
   const cube = new THREE.Mesh(cubeGeo, cubeMaterial);
   cube.position.set(...offsets);
   cube.rotation.z = (-45 * Math.PI) / 180;
