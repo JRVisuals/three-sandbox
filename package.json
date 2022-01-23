@@ -6,7 +6,7 @@
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-scripts": "5.0.0",
-    "three": "^0.125.0",
+    "three": "0.135.0",
     "threejs-orbit-controls": "^1.0.3"
   },
   "scripts": {
