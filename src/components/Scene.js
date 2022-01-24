@@ -17,6 +17,7 @@ import {
 
 class Scene extends React.Component {
   componentDidMount() {
+    this.renderer = new THREE.WebGLRenderer();
     this.initScene();
   }
   componentWillUnmount() {}
@@ -26,7 +27,7 @@ class Scene extends React.Component {
 
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 10000);
-    this.renderer = new THREE.WebGLRenderer();
+
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMapSoft = true;
 
