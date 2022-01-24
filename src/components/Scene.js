@@ -3,6 +3,12 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Lighting } from '../scene/Elements';
 
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { SparkShader } from '../shaders/SparkShader';
+import { UnrealBloomPass } from '../shaders/TransparentBackgroundUnrealBloomPass';
+
 import {
   createGround,
   createAllBars,
@@ -16,12 +22,12 @@ class Scene extends React.Component {
   componentWillUnmount() {}
 
   initScene = () => {
-    const { height, width, showHelpers } = this.props;
+    const { height, width, showHelpers, renderBloom } = this.props;
 
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 10000);
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.shadowMapEnabled = true;
+    this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMapSoft = true;
 
     this.renderer.setSize(width, height);
@@ -52,13 +58,52 @@ class Scene extends React.Component {
     scene.add(createAllBars());
     scene.add(createTargetCap());
 
+    // Postprocessing Pass -----
+
+    // Render Scene
+    this.renderScene = new RenderPass(scene, camera);
+    this.composer = new EffectComposer(this.renderer);
+    this.composer.addPass(this.renderScene);
+
+    // Render Bloom
+    if (renderBloom) {
+      const bloomPass = new UnrealBloomPass(
+        new THREE.Vector2(96, 96),
+        1.5,
+        1.75,
+        0.6
+      );
+
+      bloomPass.renderToScreen = false;
+      this.composer.addPass(bloomPass);
+    }
+
+    // Render Sparks
+    // this.sparksPass = new ShaderPass(SparkShader);
+    // this.composer.addPass(this.sparksPass);
+    // this.sparksPass.uniforms.u_resolution.value = {
+    //   x: this.myWidth,
+    //   y: this.myHeight,
+    // };
+    // this.sparkLevels = [
+    //   { str: 0.09, spd: 3.0 },
+    //   { str: 0.06, spd: 4.0 },
+    //   { str: 0.03, spd: 5.0 },
+    //   { str: 0.01, spd: 6.0 },
+    // ];
+
+    // Animate is basically the render loop...
+
     const animate = () => {
       requestAnimationFrame(animate);
 
       // required if controls.enableDamping or controls.autoRotate are set to true
       // controls.update();
 
-      this.renderer.render(scene, camera);
+      // Render by Camera
+      // this.renderer.render(scene, camera);
+      // Render by Composer (allows for multi-pass rendering)
+      this.composer.render(scene, camera);
     };
     //renderer.render( scene, camera );
 
@@ -73,16 +118,7 @@ class Scene extends React.Component {
   render() {
     const renderScene = <div ref={(ref) => (this.mount = ref)} />;
 
-    return (
-      <div style={{ backgroundColor: '#282c34' }}>
-        {renderScene}
-        <div style={{ margin: 10 }}>
-          <button onClick={this.resetScene} style={{ fontSize: 14 }}>
-            Initialize Scene with Current Settings
-          </button>
-        </div>
-      </div>
-    );
+    return <div style={{ backgroundColor: '#282c34' }}>{renderScene}</div>;
   }
 }
 
